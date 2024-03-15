@@ -108,17 +108,12 @@ namespace SwitchControllerInput.Editor
 
                     readIMU = EditorGUILayout.Toggle("Fast-frequency display: ", readIMU);
 
-                    if (GUILayout.Button("Enable IMU"))
-                    {
-                        controller.SetIMUEnabled(true);
-                    }
-
                     //* Little button for debug/dev purposes
                     // EditorGUILayout.Separator();
                     // GUILayout.Label("Debug: ", EditorStyles.boldLabel);
-                    // if (GUILayout.Button("Tst"))
+                    // if (GUILayout.Button("Test"))
                     // {
-                    //     //
+                    //     
                     // }
                 }
 

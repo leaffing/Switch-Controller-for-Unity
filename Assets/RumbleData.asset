@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: RumbleData
   m_EditorClassIdentifier: 
   profile:
-    highBandFrequencyLeft: 320
-    highBandAmplitudeLeft: 0
-    lowBandFrequencyLeft: 160
-    lowBandAmplitudeLeft: 0
+    highBandFrequencyLeft: 569
+    highBandAmplitudeLeft: 0.562
+    lowBandFrequencyLeft: 309
+    lowBandAmplitudeLeft: 0.453
     highBandFrequencyRight: 320
-    highBandAmplitudeRight: 0
+    highBandAmplitudeRight: 0.218
     lowBandFrequencyRight: 160
-    lowBandAmplitudeRight: 0
+    lowBandAmplitudeRight: 0.421

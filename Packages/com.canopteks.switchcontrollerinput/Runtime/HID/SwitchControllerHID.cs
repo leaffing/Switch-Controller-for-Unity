@@ -95,16 +95,21 @@ namespace UnityEngine.InputSystem.Switch
         #region Data re/loading
         // Are the different device informations loaded ?
         private bool m_IMUConfigDataLoaded = false;
+        private bool m_vibrationEnabled = false;
         private bool m_stickConfigDataLoaded = false;
         private bool m_deviceInfoLoaded = false;
         private bool m_colorsLoaded = false;
         private bool m_serialNumberLoaded = false;
+        private bool m_defaultLEDsSet = false;
 
         // Register the time of last request to retry to fetch them in case of timeout
+        private double m_IMUConfigTimeOfLastRequest;
+        private double m_vibrationEnabledTimeOfLastRequest;
         private double m_stickCalibrationTimeOfLastRequest;
         private double m_infoTimeOfLastRequest;
         private double m_colorsTimeOfLastRequest;
         private double m_serialNumberTimeOfLastRequest;
+        private double m_defaultLEDsSetTimeOfLastRequest;
 
         // Timeout vars
         private const int configTimerDataDefault = 500;
@@ -223,6 +228,21 @@ namespace UnityEngine.InputSystem.Switch
                 UpdateSerialNumber();
                 return;
             }
+            if(!m_vibrationEnabled)
+            {
+                UpdateVibrationEnabled();
+                return;
+            }
+            if(!m_IMUConfigDataLoaded)
+            {
+                UpdateIMUEnabled();
+                return;
+            }
+            if(!m_defaultLEDsSet)
+            {
+                UpdateDefaultLEDs();
+                return;
+            }
         }
 
         /// <summary>
@@ -274,6 +294,44 @@ namespace UnityEngine.InputSystem.Switch
             {
                 m_serialNumberTimeOfLastRequest = currentTime;
                 ReadSerialNumber();
+            }
+        }
+
+        private void UpdateVibrationEnabled()
+        {
+            double currentTime = InputRuntime.s_Instance.currentTime;
+
+            if (currentTime > m_vibrationEnabledTimeOfLastRequest + timeout)
+            {
+                m_vibrationEnabledTimeOfLastRequest = currentTime;
+                SetVibrationEnabled(true);
+            }
+        }
+
+        private void UpdateIMUEnabled()
+        {
+            double currentTime = InputRuntime.s_Instance.currentTime;
+
+            if (currentTime > m_IMUConfigTimeOfLastRequest + timeout)
+            {
+                m_IMUConfigTimeOfLastRequest = currentTime;
+                SetIMUEnabled(true);
+            }
+        }
+
+        private void UpdateDefaultLEDs()
+        {
+            double currentTime = InputRuntime.s_Instance.currentTime;
+
+            if (currentTime > m_defaultLEDsSetTimeOfLastRequest + timeout)
+            {
+                m_defaultLEDsSetTimeOfLastRequest = currentTime;
+                SetLEDs(
+                    p1: LEDStatusEnum.On,
+                    p2: LEDStatusEnum.Off,
+                    p3: LEDStatusEnum.Off,
+                    p4: LEDStatusEnum.Off
+                );
             }
         }
         #endregion
@@ -519,10 +577,46 @@ namespace UnityEngine.InputSystem.Switch
                     case SubcommandIDEnum.SPIFlashRead:
                         HandleFlashRead(response.replyData);
                         break;
+                    case SubcommandIDEnum.EnableDisableVibration:
+                        HandleVibrationEnabled();
+                        break;
+                    case SubcommandIDEnum.EnableDisableIMU:
+                        HandleIMUEnabled();
+                        break;
+                    case SubcommandIDEnum.SetPlayerLights:
+                        HandleLEDsSet();
+                        break;
                     default:
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Handle the subcommand response to a vibration enable request
+        /// </summary>
+        private void HandleVibrationEnabled()
+        {
+            // Allows to stop trying to enable it on startup
+            m_vibrationEnabled = true;
+        }
+
+        /// <summary>
+        /// Handle the subcommand response to an IMU enable request
+        /// </summary>
+        private void HandleIMUEnabled()
+        {
+            // Allows to stop trying to enable it on startup
+            m_IMUConfigDataLoaded = true;
+        }
+
+        /// <summary>
+        /// Handle the subcommand response to a user trying to set the LEDs
+        /// </summary>
+        private void HandleLEDsSet()
+        {
+            // Allows to stop trying to enable them on startup
+            m_defaultLEDsSet = true;
         }
 
         [StructLayout(LayoutKind.Sequential)]
