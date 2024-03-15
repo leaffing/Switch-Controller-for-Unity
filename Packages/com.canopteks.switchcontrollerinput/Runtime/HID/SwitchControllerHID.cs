@@ -95,12 +95,15 @@ namespace UnityEngine.InputSystem.Switch
         #region Data re/loading
         // Are the different device informations loaded ?
         private bool m_IMUConfigDataLoaded = false;
+        private bool m_vibrationEnabled = false;
         private bool m_stickConfigDataLoaded = false;
         private bool m_deviceInfoLoaded = false;
         private bool m_colorsLoaded = false;
         private bool m_serialNumberLoaded = false;
 
         // Register the time of last request to retry to fetch them in case of timeout
+        private double m_IMUConfigTimeOfLastRequest;
+        private double m_vibrationEnabledTimeOfLastRequest;
         private double m_stickCalibrationTimeOfLastRequest;
         private double m_infoTimeOfLastRequest;
         private double m_colorsTimeOfLastRequest;
@@ -223,6 +226,16 @@ namespace UnityEngine.InputSystem.Switch
                 UpdateSerialNumber();
                 return;
             }
+            if(!m_vibrationEnabled)
+            {
+                UpdateVibrationEnabled();
+                return;
+            }
+            if(!m_IMUConfigDataLoaded)
+            {
+                UpdateIMUEnabled();
+                return;
+            }
         }
 
         /// <summary>
@@ -274,6 +287,28 @@ namespace UnityEngine.InputSystem.Switch
             {
                 m_serialNumberTimeOfLastRequest = currentTime;
                 ReadSerialNumber();
+            }
+        }
+
+        private void UpdateVibrationEnabled()
+        {
+            double currentTime = InputRuntime.s_Instance.currentTime;
+
+            if (currentTime > m_vibrationEnabledTimeOfLastRequest + timeout)
+            {
+                m_vibrationEnabledTimeOfLastRequest = currentTime;
+                SetVibrationEnabled(true);
+            }
+        }
+
+        private void UpdateIMUEnabled()
+        {
+            double currentTime = InputRuntime.s_Instance.currentTime;
+
+            if (currentTime > m_IMUConfigTimeOfLastRequest + timeout)
+            {
+                m_IMUConfigTimeOfLastRequest = currentTime;
+                SetIMUEnabled(true);
             }
         }
         #endregion
@@ -519,10 +554,34 @@ namespace UnityEngine.InputSystem.Switch
                     case SubcommandIDEnum.SPIFlashRead:
                         HandleFlashRead(response.replyData);
                         break;
+                    case SubcommandIDEnum.EnableDisableVibration:
+                        HandleVibrationEnabled();
+                        break;
+                    case SubcommandIDEnum.EnableDisableIMU:
+                        HandleIMUEnabled();
+                        break;
                     default:
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Handle the subcommand response to a vibration enable request
+        /// </summary>
+        private void HandleVibrationEnabled()
+        {
+            // Allows to stop trying to enable it on startup
+            m_vibrationEnabled = true;
+        }
+
+        /// <summary>
+        /// Handle the subcommand response to an IMU enable request
+        /// </summary>
+        private void HandleIMUEnabled()
+        {
+            // Allows to stop trying to enable it on startup
+            m_IMUConfigDataLoaded = true;
         }
 
         [StructLayout(LayoutKind.Sequential)]

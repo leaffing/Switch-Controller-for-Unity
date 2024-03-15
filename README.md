@@ -38,7 +38,7 @@ General data about the connected Switch controllers can be found in the menu `Wi
 - Left and right analog sticks and stick presses
   - **Note**: Although they use the factory configuration/calibration info, they still seem to have significant drift
 
-### HD Rumble: WIP
+### HD Rumble
 
 High-band and low-band amplitude and frequency for the left and right Joy-Cons (or, in the case of the Pro Controller, the left and right sides of the controller) can be set with the `SwitchControllerHID.Rumble()` method.
 
@@ -61,11 +61,11 @@ var rumbleProfile = new SwitchControllerRumbleProfile
 controller.Rumble(rumbleProfile);
 ```
 
-The HD Rumble features can be tested `Windows/Switch Controller Debugger/Joycon Rumble Playground`
+The HD Rumble features can be tested with `Windows/Switch Controller Debugger/Joycon Rumble Playground`, or in the inspector when selecting a `RumbleDataSheet` scriptable object instance.
 
 ### Gyroscope and acceleration (partial)
 
-Once the controller's IMU has been enabled with `SwitchControllerHID.SetIMUEnabled(true)`, it will report uncalibrated acceleration and gyroscope data. In my testing, this data isn't particularly accurate, so we should figure out how to improve it.
+Report uncalibrated acceleration and gyroscope data. In my testing, this data isn't particularly accurate, so we should figure out how to improve it.
 
 ### Player LEDs
 
