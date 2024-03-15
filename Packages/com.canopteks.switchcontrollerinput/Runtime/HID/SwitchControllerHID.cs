@@ -100,6 +100,7 @@ namespace UnityEngine.InputSystem.Switch
         private bool m_deviceInfoLoaded = false;
         private bool m_colorsLoaded = false;
         private bool m_serialNumberLoaded = false;
+        private bool m_defaultLEDsSet = false;
 
         // Register the time of last request to retry to fetch them in case of timeout
         private double m_IMUConfigTimeOfLastRequest;
@@ -108,6 +109,7 @@ namespace UnityEngine.InputSystem.Switch
         private double m_infoTimeOfLastRequest;
         private double m_colorsTimeOfLastRequest;
         private double m_serialNumberTimeOfLastRequest;
+        private double m_defaultLEDsSetTimeOfLastRequest;
 
         // Timeout vars
         private const int configTimerDataDefault = 500;
@@ -236,6 +238,11 @@ namespace UnityEngine.InputSystem.Switch
                 UpdateIMUEnabled();
                 return;
             }
+            if(!m_defaultLEDsSet)
+            {
+                UpdateDefaultLEDs();
+                return;
+            }
         }
 
         /// <summary>
@@ -309,6 +316,22 @@ namespace UnityEngine.InputSystem.Switch
             {
                 m_IMUConfigTimeOfLastRequest = currentTime;
                 SetIMUEnabled(true);
+            }
+        }
+
+        private void UpdateDefaultLEDs()
+        {
+            double currentTime = InputRuntime.s_Instance.currentTime;
+
+            if (currentTime > m_defaultLEDsSetTimeOfLastRequest + timeout)
+            {
+                m_defaultLEDsSetTimeOfLastRequest = currentTime;
+                SetLEDs(
+                    p1: LEDStatusEnum.On,
+                    p2: LEDStatusEnum.Off,
+                    p3: LEDStatusEnum.Off,
+                    p4: LEDStatusEnum.Off
+                );
             }
         }
         #endregion
@@ -560,6 +583,9 @@ namespace UnityEngine.InputSystem.Switch
                     case SubcommandIDEnum.EnableDisableIMU:
                         HandleIMUEnabled();
                         break;
+                    case SubcommandIDEnum.SetPlayerLights:
+                        HandleLEDsSet();
+                        break;
                     default:
                         break;
                 }
@@ -582,6 +608,15 @@ namespace UnityEngine.InputSystem.Switch
         {
             // Allows to stop trying to enable it on startup
             m_IMUConfigDataLoaded = true;
+        }
+
+        /// <summary>
+        /// Handle the subcommand response to a user trying to set the LEDs
+        /// </summary>
+        private void HandleLEDsSet()
+        {
+            // Allows to stop trying to enable them on startup
+            m_defaultLEDsSet = true;
         }
 
         [StructLayout(LayoutKind.Sequential)]

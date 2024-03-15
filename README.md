@@ -74,10 +74,10 @@ The green LEDs on the controllers can be set with `SwitchControllerHID.SetLEDs()
 Example:
 ```c#
 controller.SetLEDs(
-    p1: SwitchControllerLEDStatusEnum.Off,
-    p2: SwitchControllerLEDStatusEnum.On,
-    p3: SwitchControllerLEDStatusEnum.Flashing,
-    p4: SwitchControllerLEDStatusEnum.On
+    p1: LEDStatusEnum.Off,
+    p2: LEDStatusEnum.On,
+    p3: LEDStatusEnum.Flashing,
+    p4: LEDStatusEnum.On
     );
 ```
 
